@@ -6,8 +6,11 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { FaRegCommentAlt, FaHeart, FaRegHeart } from "react-icons/fa";
+import CommentsModal from './CommentsModal'
+
 
 const Post = ({post, friends})=>{
+  const [refresh, setRefresh] = useState(false)
   const [liked, setLiked] = useState(false)
   const [isFriend, setIsfriend] = useState(false)
   const [likes, setLikes] = useState([])
@@ -19,6 +22,27 @@ const Post = ({post, friends})=>{
   const user_data = Cookies.get('user_data')
   const nav = useNavigate()
   
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  
+  const commentHandler = ()=>{
+    setIsModalOpen(true)
+  }
+  
+  const handleCloseModal = ()=>{
+    setIsModalOpen(false)
+  }
+  
+  const handleAddComment = (content)=>{
+    axios.post(`/posts/comment/${post.id}`, {content}, {withCredentials:true})
+    .then(({data})=>
+    {
+      if(data.success){
+        toast.success(data.message)
+        setRefresh((prev)=>!prev)
+      }else toast.error(data.message)
+    }
+    )
+  }
   
   const addFriendHandler = ()=>{
     axios.post(`/friends/request/${post.user_id}`, {withCredentials: true})
@@ -49,6 +73,9 @@ const Post = ({post, friends})=>{
   }
   
   useEffect(()=>{
+    setLikes([])
+    setComments([])
+    
     if(user_data){
       setUser_id(JSON.parse(user_data).user_id)
     }
@@ -75,7 +102,7 @@ const Post = ({post, friends})=>{
     if(friends) { 
       setIsfriend(friends.find((friend)=>friend.id==post.user_id))
     }
-  },[])
+  },[refresh])
   
   useEffect(()=>{
     if(likes){
@@ -83,7 +110,7 @@ const Post = ({post, friends})=>{
       if(checkLiked.length>0) setLiked(true)
     }
     
-  },[likes])
+  },[likes, refresh])
   
   return (
     <div className='post'>
@@ -126,12 +153,20 @@ const Post = ({post, friends})=>{
             {likes.length}
           </p>
         </div>
-        <div className="comment-post sec">
+        <div className="comment-post sec" onClick={commentHandler}>
           <FaRegCommentAlt className='opt-icon'/>
           <p>
             {comments.length}
           </p>
         </div>
+        {isModalOpen&& 
+          <CommentsModal
+            comments={comments}
+            onClose={handleCloseModal}
+            onAddComment={handleAddComment}
+            {...{setRefresh}}
+          />
+        }
       </div>
     </div>
   )
