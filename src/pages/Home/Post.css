@@ -1,0 +1,140 @@
+.post{
+  width: 100%;
+  border: 2px solid #000;
+  border-radius: 5px;
+  padding: 1.5rem 2rem .5rem 1.5rem;
+}
+
+.post-data{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 5px;
+  border-bottom: 1px solid black;
+  user-select: none;
+}
+
+.post-data .post-user{
+  display: flex;
+  position: relative;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 600;
+}
+
+.post-user-img{
+  height: 40px;
+  border-radius: 50%;
+}
+
+.post-data .username{
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.post-content{
+  margin: 7px 0;
+  padding: 15px 10px 25px 10px;
+  text-align: right;
+  font-size: 20px;
+  text-wrap: wrap;
+}
+
+.post-options{
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid black;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding-top: 5px;
+  color: #000;
+}
+
+.post-options .sec{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  transition: .15s;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.post-options .sec:hover{
+  background-color: #dddddd;
+}
+
+.post-options .comment-post{
+  grid-area: 1/2;
+}
+
+.post-options .like-post{
+  grid-area: 1/3;
+}
+
+.opt-icon{
+  font-size: 25px;
+}
+
+
+.post-options .like-post .opt-icon{
+  color: #f26;
+}
+
+.post-options p{
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+}
+
+.post-profile-card {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 180px;
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  text-align: center;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(-10px); 
+  transition: .3s ease;
+}
+
+.post-profile-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.post-profile-card .card-button {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.post-profile-card .card-button:last-child {
+  margin-bottom: 0;
+}
+.post-profile-card .card-button.friends {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.post-profile-card .card-button:hover {
+  background-color: #0056b3;
+}
+
+.post-profile-card.show {
+  opacity: 1;
+  transform: translateY(0);
+}

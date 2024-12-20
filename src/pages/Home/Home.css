@@ -1,0 +1,48 @@
+.home-container{
+  margin: 0 auto;
+  width: 50%;
+  padding: 9rem 0 5rem;
+}
+
+h1.no-posts{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #505050;
+}
+
+.posts{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  
+}
+
+.create-post{
+  font-size: 20px;
+  padding: 0 25px 30px 25px;
+}
+
+.create-post-btn{
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 20px;
+  padding: .5rem .75rem;
+  background-color: #0092e8;
+  margin-top: 15px;
+  transition: .15s;
+}
+
+.create-post-btn:hover{
+  background-color: #72c0ed;
+}
+
+@media only screen and (max-width:786px){
+  .home-container{
+    width: 90%;
+  }
+}

@@ -1,0 +1,21 @@
+.search-container{
+  padding: 8rem 5rem;
+}
+
+.search-feedback, .header{
+  text-align: right;
+}
+
+.header{
+  margin-bottom: 2rem;
+}
+
+.sec-header{
+  margin-bottom: 1.5rem;
+}
+
+.posts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

@@ -1,0 +1,33 @@
+@font-face {
+  font-family: Arabic;
+  src: url('./assets/fonts/Alexandria-VariableFont_wght.ttf');
+}
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arabic;
+}
+
+a{
+  text-decoration: none;
+}
+
+li, ul{
+  list-style: none;
+}
+
+body{
+  width: 100vw;
+}
+
+.dark-background{
+  position: fixed;
+  z-index: 99;
+  background: rgba(0,0,0, .4);
+  height: 100vh;
+  width: 100vw;
+  left: 0;
+  top: 0;
+}
