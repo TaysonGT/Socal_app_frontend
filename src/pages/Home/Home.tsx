@@ -4,10 +4,11 @@ import Post from './Post'
 import axios from 'axios'
 import CreatePostDialogue from './CreatePostDialogue'
 import DarkBackground from '../../components/DarkBackground'
+import { UserType, PostType } from '../../types/types'
 
-const Home = ()=>{
-  const [posts, setPosts] = useState([])
-  const [friends, setFriends] = useState([])
+const Home: React.FC = ()=>{
+  const [posts, setPosts] = useState<PostType[]>([])
+  const [friends, setFriends] = useState<UserType[]>([])
   const [dialogue, setDialogue] = useState(false)
   useEffect(()=>{
     axios.get('/posts/all')

@@ -1,4 +1,3 @@
-import React, {useEffect} from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Home from './pages/Home/Home'
@@ -23,11 +22,11 @@ function App() {
       }/>
         <Routes>
           <Route path='/auth' element={<LoginRoute />} >
-            <Route index element={<Login/>} path='/auth/login' exact/>
-            <Route index element={<Signup/>} path='/auth/signup' exact/>
+            <Route index element={<Login/>} path='/auth/login' />
+            <Route index element={<Signup/>} path='/auth/signup' />
           </Route>
           <Route path='/' element={<PrivateRoutes />}>
-            <Route index element={<Home />} path='/' exact />
+            <Route index element={<Home />} path='/'  />
             <Route element={<Search />} path='/search'/>
             <Route element={<Profile />} path='/profile/:userId' />
             <Route element={<Friends />} path='/friends' />

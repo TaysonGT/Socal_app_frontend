@@ -5,10 +5,12 @@ import './Search.css'
 import '../Home/Home.css'
 import Post from '../Home/Post'
 import PeopleSlider from './PeopleSlider'
+import { PostType, UserType } from '../../types/types'
 
-const Search = () => {
-  const [users, setUsers] = useState([]);
-  const [posts, setPosts] = useState([]);
+const Search: React.FC = () => {
+  const [users, setUsers] = useState<UserType[]>([]);
+  const [friends, setFriends] = useState<UserType[]>([]);
+  const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
 
@@ -23,6 +25,11 @@ const Search = () => {
       }).finally(()=>{
         setLoading(false);
       })
+      
+    axios.get('/friends/all')
+    .then(({data})=>{
+      setFriends(data.users)
+    })
     }
   }, [query]);
 
@@ -48,7 +55,7 @@ const Search = () => {
           <h3 className='search-feedback sec-header' dir='rtl'>المنشورات:</h3>
           <div className='posts-list'>
             {posts.map((post) => (
-              (<Post {... {post}} key={post.id}/>)
+              (<Post {... {post, friends}} key={post.id}/>)
             ))}
           </div>
         </>

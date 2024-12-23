@@ -74,6 +74,19 @@
   align-items: center;
 }
 
+.link-content span{
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  right: 0;
+  background-color: red;
+  color: white;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+}
+
 .link-img{
   height: 30px;
 }
@@ -107,7 +120,7 @@
   top: 6rem;
   left: 0;
   width: 100%;
-  padding: 10px;
+  padding: 10px 30px 10px 10px;
   background-color: #444;
 }
 
@@ -124,9 +137,9 @@
   color: white;
   border: none;
   border-radius: 5px;
-  padding: 5px 10px;
+  padding: 8px 12px;
   cursor: pointer;
-  margin-left: 5px;
+
 }
 
 .close-btn {

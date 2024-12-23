@@ -11,25 +11,37 @@
     "start:debug": "DEBUG=* vite"
   },
   "dependencies": {
+    "@babel/types": "^7.26.3",
     "axios": "^1.7.9",
     "eruda": "^3.4.1",
     "js-cookie": "^3.0.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "json-schema": "^0.4.0",
+    "react": "^19.0.0",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^5.4.0",
-    "react-router-dom": "^7.0.2"
+    "react-router": "^7.1.0",
+    "react-router-dom": "^7.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/babel-template": "^6.25.5",
+    "@types/babel-traverse": "^6.25.10",
+    "@types/cookie": "^0.6.0",
+    "@types/estree": "^1.0.6",
+    "@types/js-cookie": "^3.0.6",
+    "@types/json-schema": "^7.0.15",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.1",
+    "@typescript-eslint/parser": "^8.18.1",
     "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.15.0",
+    "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.12.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
     "vite": "^6.0.1"
   }
 }

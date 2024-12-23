@@ -1,19 +1,20 @@
 import Cookies from 'js-cookie';
 import { Navigate, useLocation, Outlet } from 'react-router-dom'
 import Navbar from '../components/Navbar';
-import React, {useState, useEffect} from 'react'
+import {useState, useEffect} from 'react'
 
 const LoginRoute = () => {
     const location = useLocation();
-    const [token, setToken] = useState(Cookies.get('access_token'))
+    const [token, setToken] = useState<string | null>('')
     useEffect(() => {
-        setToken(Cookies.get('access_token'))
+      let tokenString: string = Cookies.get('access_token')?? '' ;
+      tokenString&& setToken(tokenString)
     }, [])
     
 
     if(!token){
         return <>
-            <Navbar token={token} />
+            <Navbar {...{token: null, fullname:null}} />
             <Outlet />
         </>
     }else{

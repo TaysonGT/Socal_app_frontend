@@ -1,12 +1,22 @@
 import Cookies from 'js-cookie'
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import axios, {AxiosResponse} from 'axios'
+import React, { useState } from 'react'
 import {useNavigate, Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import './Signup.css'
 
+interface SignupResponse{
+  success: boolean;
+  message: string;
+  expDate: Date;
+  firstname: string;
+  lastname: string;
+  user_id: string;
+  username: string;
+  token: string;
+}
 
-const Signup = () => {
+const Signup: React.FC = () => {
 
   const [firstname, setFirstname] = useState('')
   const [lastname, setLastname] = useState('')
@@ -18,11 +28,9 @@ const Signup = () => {
   
   const [checkValid, setCheckValid] = useState(false)
   
-  const [message, setMessage] = useState('')
-  const [success, setSuccess] = useState()
   
   const navigate = useNavigate();
-  const handleLogin = (e)=>{
+  const handleLogin = async(e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault();
     let token = Cookies.get('access_token')
     if(!(firstname && lastname && username && password && validPassword && email && gender)){
@@ -31,21 +39,20 @@ const Signup = () => {
       toast.error('برجاء اعادة تأكيد كلمة المرور')
     }else{
       if(!token){
-        axios.post('/api/auth/signup', {username, password, email, firstname, lastname, gender}, {withCredentials: true})
-        .then(({data})=>{
-          if(data.success){
-            Cookies.set('access_token', data.token, {expires: new Date(data.expDate), secure: true, path: '/'})
-            Cookies.set('user_data', JSON.stringify({
-              username: data.username, 
-              user_id: data.user_id,
-              firstname: data.firstname,
-              lastname: data.lastname
-            }), {expires: new Date(data.expDate), secure: true, path: '/'})
-            navigate('/')
-          }else{
-            toast.error(data.message)
-          }
-        }).catch(err=> console.log(err))
+        const response: AxiosResponse<SignupResponse> = await axios.post('/api/auth/signup', {username, password, email, firstname, lastname, gender}, {withCredentials: true})
+       
+        if(response.data.success){
+          Cookies.set('access_token', response.data.token, {expires: new Date(response.data.expDate), secure: true, path: '/'})
+          Cookies.set('user_response.data', JSON.stringify({
+            username: response.data.username, 
+            user_id: response.data.user_id,
+            firstname: response.data.firstname,
+            lastname: response.data.lastname
+          }), {expires: new Date(response.data.expDate), secure: true, path: '/'})
+          navigate('/')
+        }else{
+          toast.error(response.data.message)
+        }
       }else{
         toast.error("لقد سجلت دخولك بالفعل!")
         navigate('/')
@@ -53,47 +60,40 @@ const Signup = () => {
     }
   }
 
-  useEffect(()=>{
-    if (message){
-      success? toast.success(message) : toast.error(message)
-    }
-    setMessage(null) 
-  }, [message, success])
-
   return (
     <div className='login-container'>
         <div dir='rtl' className='login-form-container'>
           <h1>إنشاء حساب</h1>
-          <form>
+          <form onSubmit={handleLogin}>
             <label>الاسم الاول</label>
             <input placeholder="ادخل الاسم الاول" onInput={e=>
-            setFirstname(e.target.value)} type="text" name="firstname" />
+            setFirstname(e.currentTarget.value)} type="text" name="firstname" />
             <label>اسم العائلة</label>
             <input placeholder="ادخل اسم العائلة" onInput={e=>
-            setLastname(e.target.value)} type="text" name="lastname" />
+            setLastname(e.currentTarget.value)} type="text" name="lastname" />
             <label>البريد الالكتروني</label>
             <input placeholder="ادخل البريد الالكتروني" onInput={e=>
-            setEmail(e.target.value)} type="email" name="email" />
+            setEmail(e.currentTarget.value)} type="email" name="email" />
             
             <label>اسم المستخدم</label>
             <input placeholder="ادخل اسم المستخدم" onInput={e=>
-            setUsername(e.target.value)} type="text" name="username" />
+            setUsername(e.currentTarget.value)} type="text" name="username" />
             <label>كلمة المرور</label>
             <input  placeholder="ادخل كلمة المرور"
-            onInput={(e)=>setPassword(e.target.value)} type="password"/>
+            onInput={(e)=>setPassword(e.currentTarget.value)} type="password"/>
             <label>تأكيد كلمة المرور</label>
             <input  placeholder=" تأكيد كلمة المرور"
             onInput={(e)=>{
-              setValidPassword(e.target.value)
-              e.target.value==password? setCheckValid(true) : setCheckValid(false)
+              setValidPassword(e.currentTarget.value)
+              e.currentTarget.value==password? setCheckValid(true) : setCheckValid(false)
             }} type="password" className={!checkValid? 'non-valid' : ''}/>
             <label>النوع</label>
-            <select onInput={(e)=>setGender(e.target.value)}>
+            <select onInput={(e)=>setGender(e.currentTarget.value)}>
               <option value='male'>ذكر</option>
               <option value='female'>أنثى</option>
             </select>
             
-            <button onClick={handleLogin}>إنشاء حساب</button>
+            <button type="submit">إنشاء حساب</button>
           </form>
           <div className='to-signup'>
             <p>لديك حساب بالفعل؟</p>

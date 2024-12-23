@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import "./CommentsModal.css";
 import Comment from './Comment'
+import { CommentType } from '../../types/types'
 
-const CommentsModal = ({ comments, onClose, onAddComment, setRefresh }) => {
+interface Props{
+  comments: CommentType[];
+  setRefresh: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: ()=> void;
+  onAddComment: (content: string)=> void;
+}
+
+const CommentsModal: React.FC<Props> = ({ comments, onClose, onAddComment, setRefresh }) => {
   const [newComment, setNewComment] = useState("");
   const handleAddComment = () => {
     if (newComment.trim()) {
@@ -25,8 +33,8 @@ const CommentsModal = ({ comments, onClose, onAddComment, setRefresh }) => {
         </div>
         <div className="comments-list">
           {comments.length > 0 ? (
-            comments.map((comment, index) => (
-              <Comment key={index} {...{comment, setRefresh}}/>
+            comments.map((comment) => (
+              <Comment key={comment.id} {...{comment, setRefresh}}/>
             ))
           ) : (
             <p dir='rtl'>ليس هناك تعليقات</p>

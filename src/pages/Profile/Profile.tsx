@@ -5,28 +5,52 @@ import './Profile.css';
 import Post from '../Home/Post'
 import axios from 'axios';
 import toast from 'react-hot-toast'
+import { UserType, FriendRequestType, PostType } from '../../types/types'
 
-const Profile = () => {
+const Profile: React.FC = () => {
   const { userId } = useParams();
-  const [user, setUser] = useState()
-  const [posts, setPosts] = useState([])
-  const [friends, setFriends] = useState([])
+  const [user, setUser] = useState<UserType>()
+  const [posts, setPosts] = useState<PostType[]>([])
+  const [friends, setFriends] = useState<UserType[]>([])
+  const [friendRequests, setFriendRequests] = useState<FriendRequestType[]>([])
   const [user_id,setUser_id] = useState('')
   const [myProfile, setMyProfile] = useState(false)
   const [friendStatus, setFriendStatus] = useState('none')
+  const [refresh, setRefresh] = useState(false)
   
   const user_data = Cookies.get('user_data')
   
   const handleFriendAction = () => {
+    let request = friendRequests.find((request)=> request.receiver_id==userId)
     if(friendStatus=='none'){
       axios.post(`/friends/request/${userId}`)
       .then(({data})=>{
         if(data.success){
           toast.success(data.message)
-          setFriendStatus('pending')
+          setRefresh((prev)=>!prev)
         }else toast.error(data.message)
       })
+    }else if(friendStatus=='friends'){
+      axios.delete(`/friends/${userId}`)
+      .then(({data})=>{
+        if(data.success) {
+          toast.success(data.message)
+          setRefresh((prev)=>!prev)
+        }else toast.error(data.message)
+      })
+    }else{
+      if(friendRequests && request){
+        axios.delete(`/friends/request/${request.id}`)
+        .then(({data})=>{
+          if(data.success){
+            toast.success(data.message) 
+            setRefresh((prev)=>!prev)
+          } else toast.error(data.message)
+          
+        })
+      }
     }
+    
   };
 
   useEffect(()=>{
@@ -42,10 +66,14 @@ const Profile = () => {
     .then(({data})=>{
       setFriends(data.users)
     })
+    axios.get(`/friends/request/me`)
+    .then(({data})=>{
+      setFriendRequests(data.requests)
+    })
     if(user_data){
       setUser_id(JSON.parse(user_data).user_id)
     }
-  },[])
+  },[refresh])
   
   useEffect(()=>{
     if(user && user_id){
@@ -55,20 +83,29 @@ const Profile = () => {
         setMyProfile(false)
       }
     }    
-    if(friends){
-      let check = friends.find((friend)=> friend.id == user_id)
-      check&& setFriendStatus('friends')
+    if(friends || friendRequests){
+      
+      let checkFriend = friends.find((friend)=>friend.id==user_id)
+      checkFriend && setFriendStatus('friends')
+      let checkFriendRequest = friendRequests?.find((request)=>request.receiver_id == userId)
+      checkFriendRequest && setFriendStatus('pending')
+      
+      if(!(checkFriend || checkFriendRequest)) setFriendStatus('none')
     }
-  },[user, friends])
+  },[user, friends, friendRequests, refresh])
   
   return (
     <div className="profile-page-container">
       <div className="profile-page-header">
-        <img src={user?.profilepic || '/src/assets/user.png'} alt="Profile" className="profile-page-pic" />
-        <h1>{`${user?.firstname} ${user?.lastname}`}</h1>
-        <p>@{user?.username}</p>
-        <p>Email: {user?.email}</p>
-        <p>Joined: {new Date(user?.created_at).toLocaleDateString()}</p>
+      {user?
+        <>
+        <img src='/src/assets/user.png' alt="Profile" className="profile-page-pic" />
+        <h1>{`${user.firstname} ${user.lastname}`}</h1>
+        <p>@{user.username}</p>
+        <p>Email: {user.email}</p>
+        <p>Joined: {new Date(user.created_at).toLocaleDateString()}</p>
+        </> : ''
+      }
         
         {!myProfile&& 
           <button
@@ -109,7 +146,7 @@ const Profile = () => {
         <h2 dir='rtl'>{!myProfile? 'منشورات المستخدم:': 'منشوراتي'}</h2>
         <div className="posts-list">
           {posts?.map((post) => (
-            <Post {...{post}}/>
+            <Post {...{post, friends}}/>
           ))}
         </div>
       </div>

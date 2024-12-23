@@ -122,6 +122,19 @@
   font-size: 0.9rem;
 }
 
+.post-profile-card .card-button.pending {
+  background-color: #ffb451;
+  color: #000;
+}
+
+.post-profile-card .card-button.pending:hover {
+  background-color: #ffcc89;
+}
+
+.post-profile-card .card-button.friends:hover {
+  background-color: #28a745;
+  color: #fff;
+}
 .post-profile-card .card-button:last-child {
   margin-bottom: 0;
 }

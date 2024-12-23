@@ -3,11 +3,15 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import './Dialogue.css'
 
-const CreatePostDialogue = ({setDialogue}) => {
+interface Props {
+  setDialogue: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const CreatePostDialogue: React.FC<Props> = ({setDialogue}) => {
   
   const [postContent, setPostContent] = useState('')
   
-  const postHandler = (e)=>{
+  const postHandler = (e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault()
       if(postContent){
         axios.post('/posts', {content:postContent}, {withCredentials: true})
@@ -27,11 +31,11 @@ const CreatePostDialogue = ({setDialogue}) => {
     <div dir='rtl' className='dialogue-container'>
       <div className="dialogue">
       <h2 className="dialogue-title">إنشاء منشور</h2>
-        <form>
+        <form onSubmit={postHandler}>
           <div>
-            <textarea onInput={(e)=> setPostContent(e.target.value)} placeholder='ماذا يخطر ببالك؟' />    
+            <textarea onInput={(e)=> setPostContent(e.currentTarget.value)} placeholder='ماذا يخطر ببالك؟' />    
           </div>
-          <button onClick={(e)=> postHandler(e)}>نشر</button>
+          <button type="submit">نشر</button>
         </form>
       </div>
     </div>

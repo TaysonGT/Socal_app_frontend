@@ -3,13 +3,18 @@ import './Post.css'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { FaRegCommentAlt, FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { LikeType, UserType, CommentType  } from '../../types/types'
 
-const Comment = ({ comment, setRefresh }) => {
-  const [user, setUser] = useState()
-  const [likes, setLikes] = useState()
+interface Props {
+  comment: CommentType;
+}
+
+const Comment: React.FC<Props> = ({ comment }) => {
+  const [user, setUser] = useState<UserType>()
+  const [likes, setLikes] = useState<LikeType[]>()
   const [liked, setLiked] = useState(false)
-  const [user_id, setUser_id] = useState()
+  const [user_id, setUser_id] = useState('')
   const user_data = Cookies.get('user_data')
   
    
@@ -34,12 +39,15 @@ const Comment = ({ comment, setRefresh }) => {
     .then(({data})=>{
       if(data.success){
         toast.success(data.message)
-        if(liked){
-          setLikes((prevItems)=> prevItems.filter((item)=> item.user_id !== user_id))
-        }else{
-          setLikes((prevItems)=> [...prevItems, {id: likes.length+2, user_id, comment_id: comment.id}])
+        if(likes){
+          if(liked){
+            setLikes((prevItems)=> prevItems!.filter((item)=> item.user_id !== user_id))
+          }else{
+            setLikes((prevItems)=> [...prevItems!, {id: (likes.length+2).toString(), user_id, comment_id: comment.id, type: 'comment', post_id: null}])
+          }
+          setLiked((prev)=>!prev)
+            
         }
-        setLiked((prev)=>!prev)
       }
     })
   }

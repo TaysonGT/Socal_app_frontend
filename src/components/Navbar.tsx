@@ -4,12 +4,18 @@ import Home from '../assets/home.png'
 import Search from '../assets/search.png' 
 import Bell from '../assets/bell.png' 
 import Contacts from '../assets/contacts.png' 
-import UserIcon from '../assets/user.png'
+import UserIcon from '/src/assets/user.png'
+import axios from 'axios'
 import './Navbar.css'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { FriendRequestType } from '../types/types'
 
+interface Props {
+  token: string | null;
+  fullname: string | null;
+}
 
-const Navbar = ({token, fullname}) => {
+const Navbar: React.FC<Props> = ({token, fullname}) => {
   let location = useLocation()
   const nav = useNavigate()
 
@@ -22,13 +28,14 @@ const Navbar = ({token, fullname}) => {
 
   const [currentLocation, setCurrentLocation] =  useState(location)
   const [isSearchVisible, setIsSearchVisible] = useState(false)
+  const [friendRequests, setFriendRequests] = useState<FriendRequestType[]>([])
   const [searchQuery,setSearchQuery] = useState("")
   
   const toggleSearchBar = () =>{
     setIsSearchVisible((prev)=>!prev)
   }
   
-  const handleSearch = (e)=>{
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) =>{
     e.preventDefault()
     console.log(searchQuery)
     if(searchQuery.trim()){
@@ -37,7 +44,7 @@ const Navbar = ({token, fullname}) => {
     }
   }
 
-  const logoutHandler = (e)=>{
+  const logoutHandler = (e: React.MouseEvent<HTMLButtonElement>) =>{
     e.preventDefault()
     Cookies.remove('user_data')
     Cookies.remove('access_token')
@@ -46,6 +53,8 @@ const Navbar = ({token, fullname}) => {
 
   useEffect(()=>{
       setCurrentLocation(location)
+      axios.get('/friends/request/all')
+      .then(({data})=>{setFriendRequests(data.requests)})
   },[location])
 
 
@@ -64,6 +73,14 @@ const Navbar = ({token, fullname}) => {
                 <img src={image} className='link-img' alt="" /> 
                 <p className='link-text'>{link}</p>
               </div>
+              : path.split('/')[1]=='friends'?
+              <Link to={path} className='link-content friends' >
+                <img src={image} className='link-img' alt="" /> 
+                <p className='link-text'>{link}</p>
+                {friendRequests?.length>0 &&
+                  <span>{friendRequests?.length}</span>
+                }
+              </Link>
               :
               <Link to={path} className='link-content' >
                 <img src={image} className='link-img' alt="" /> 
@@ -75,13 +92,13 @@ const Navbar = ({token, fullname}) => {
         </ul>
         <button  onClick={logoutHandler} className='logout-btn'>تسجيل الخروج</button>
         {isSearchVisible &&
-          <form dir='rtl' className='search-form'>
-            <input type='text' placeholder='بحث'
+          <form className='search-form'>
+            <input dir='rtl' type='text' placeholder='بحث'
               defaultValue={searchQuery} 
-              onChange={(e)=> setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.currentTarget.value)}
               className='search-input'
             />
-            <button onClick={(e)=> handleSearch(e)} type='submit' className='search-btn'>srch</button>
+            <button onClick={() => handleSearch} type='submit' className='search-btn'>بحث</button>
             <button type='button' className='close-btn' onClick={()=> setIsSearchVisible(false)}>x</button>
           </form>
         }

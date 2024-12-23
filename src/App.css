@@ -31,3 +31,8 @@ body{
   left: 0;
   top: 0;
 }
+
+.pending-btn{
+  background-color: #ffb451;
+  color: #000;
+}
