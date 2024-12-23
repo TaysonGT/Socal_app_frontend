@@ -9,7 +9,7 @@ interface Props {
 
 const CreatePostDialogue: React.FC<Props> = ({setDialogue}) => {
   
-  const [postContent, setPostContent] = useState('')
+  const [postContent, setPostContent] = useState<string>('')
   
   const postHandler = (e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault()

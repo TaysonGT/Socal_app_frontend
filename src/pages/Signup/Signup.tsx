@@ -43,7 +43,7 @@ const Signup: React.FC = () => {
        
         if(response.data.success){
           Cookies.set('access_token', response.data.token, {expires: new Date(response.data.expDate), secure: true, path: '/'})
-          Cookies.set('user_response.data', JSON.stringify({
+          Cookies.set('user_data', JSON.stringify({
             username: response.data.username, 
             user_id: response.data.user_id,
             firstname: response.data.firstname,

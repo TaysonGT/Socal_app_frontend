@@ -6,7 +6,7 @@ import Navbar from '../components/Navbar';
 const PrivateRoutes = () => {
   const location = useLocation()
   const data = Cookies.get('user_data')
-  const [token, setToken] = useState<string | null>(Cookies.get("access_token")!) 
+  const [token, setToken] = useState<string | null>(Cookies.get("access_token")?.toString() ?? null) 
   const [fullname, setFullname] = useState<string>('') 
   useEffect(() => {
     if(data) {
