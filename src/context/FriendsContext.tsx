@@ -1,21 +1,29 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios'
-import { UserType } from '../types/types'
+import { UserType, FriendRequestType } from '../types/types'
 
-const FriendsContext = createContext<{friends: UserType[]}>({friends: []})
+const FriendsContext = createContext<{friends: UserType[], friendRequests:FriendRequestType[]}>({friends: [], friendRequests: []})
 
+// , setRefreshContext: React.Dispatch<React.SetStateAction<boolean>>(false)
 export const FriendsProvider = ({ children }:{children: React.JSX.Element}) => {
   const [friends, setFriends] = useState<UserType[]>([])
-  // const [refresh, setRefresh] = useState(false)
+  const [friendRequests, setFriendRequests] = useState<FriendRequestType[]>([])
+  // const [refreshContext, setRefreshContext] = useState(false)
   useEffect(() => {
     axios.get('/friends/all')
-    .then(({data}) => setFriends(data.users))
+    .then(({data}) => {
+      setFriends(data.users)
+    })
+    axios.get('/friends/request/me')
+    .then(({data}) => {
+      setFriendRequests(data.requests)
+    })
     
   }, [])
   
 
   return (
-    <FriendsContext.Provider value={{friends}}>
+    <FriendsContext.Provider value={{friends, friendRequests}}>
       {children}
     </FriendsContext.Provider>
   );

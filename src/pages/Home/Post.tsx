@@ -6,7 +6,7 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import { FaRegCommentAlt, FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentsModal from './CommentsModal'
-import { FriendRequestType, LikeType, CommentType, PostType, UserType } from '../../types/types'
+import { LikeType, CommentType, PostType, UserType } from '../../types/types'
 import { useFriends } from '../../context/FriendsContext'
 
 interface Props {
@@ -18,7 +18,6 @@ const Post: React.FC<Props> = ({post})=>{
   const [refresh, setRefresh] = useState(false)
   const [liked, setLiked] = useState(false)
   const [friendStatus, setFriendStatus] = useState<string | null>('none')
-  const [friendRequests, setFriendRequests] = useState<FriendRequestType[]>([])
   const [likes, setLikes] = useState<LikeType[]>([])
   const [comments, setComments] = useState<CommentType[]>([])
   const [user, setUser] = useState<UserType>()
@@ -26,8 +25,7 @@ const Post: React.FC<Props> = ({post})=>{
   const [user_id,setUser_id] = useState('')
   const user_data = Cookies.get('user_data')
   const nav = useNavigate()
-  const friends = useFriends().friends
-  // const refreshFriends = useFriends().refreshFriends
+  const {friends, friendRequests} = useFriends()
   
   const [isModalOpen, setIsModalOpen] = useState(false)
   
@@ -73,7 +71,7 @@ const Post: React.FC<Props> = ({post})=>{
         }else toast.error(data.message)
       })
     }
-    // refreshFriends()
+    // setRefreshContext((prev)=> !prev)
   }
   
   const likeHandler = ()=>{
@@ -119,10 +117,6 @@ const Post: React.FC<Props> = ({post})=>{
         toast.error('برجاء اعادة تحميل الصفحة')
       }
     })
-    axios.get(`/friends/request/all`)
-      .then(({data})=>{
-        setFriendRequests(data.requests)
-      })
   },[refresh])
   
   useEffect(()=>{
