@@ -1,31 +1,23 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import './Dialogue.css'
+import './CreatePostDialogue.css'
+import { addPostHandler } from '../../utils/Processors'
 
 interface Props {
   setDialogue: React.Dispatch<React.SetStateAction<boolean>>
+  dialogue: boolean
 }
 
-const CreatePostDialogue: React.FC<Props> = ({setDialogue}) => {
+const CreatePostDialogue: React.FC<Props> = ({setDialogue, dialogue}) => {
   
   const [postContent, setPostContent] = useState<string>('')
   
   const postHandler = (e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault()
-      if(postContent){
-        axios.post('/posts', {content:postContent}, {withCredentials: true})
-        .then(({data})=>{
-          data.success? toast.success(data.message) : toast.error(data.message)
-          setDialogue(false)
-        })
-      }else{
-        toast.error('برجاء إدخال محتوى للمنشور')
-      }
+    addPostHandler(postContent, setDialogue)
   }
   useEffect(()=>{
     setPostContent('')
-  },[])
+  },[dialogue])
 
   return (
     <div dir='rtl' className='dialogue-container'>

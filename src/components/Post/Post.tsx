@@ -5,13 +5,13 @@ import Cookies from 'js-cookie'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { FaRegCommentAlt, FaHeart, FaRegHeart } from "react-icons/fa";
-import CommentsModal from './CommentsModal'
+import CommentsModal from './CommentsModal/CommentsModal'
 import { LikeType, CommentType, PostType, UserType } from '../../types/types'
 import { useFriends } from '../../context/FriendsContext'
+import { likePostHandler } from '../../utils/Processors'
 
 interface Props {
   post: PostType;
-  friends: UserType[];
 }
 
 const Post: React.FC<Props> = ({post})=>{
@@ -25,7 +25,7 @@ const Post: React.FC<Props> = ({post})=>{
   const [user_id,setUser_id] = useState('')
   const user_data = Cookies.get('user_data')
   const nav = useNavigate()
-  const {friends, friendRequests} = useFriends()
+  const {myFriends, sentFriendRequests, sendFriendRequest, removeFriend, removeFriendRequest} = useFriends()
   
   const [isModalOpen, setIsModalOpen] = useState(false)
   
@@ -45,50 +45,17 @@ const Post: React.FC<Props> = ({post})=>{
   const addFriendHandler = ()=>{
     let userId = post.user_id
     if(friendStatus=='none'){
-      axios.post(`/friends/request/${userId}`)
-      .then(({data})=>{
-        if(data.success){
-          toast.success(data.message)
-          setRefresh((prev)=>!prev)
-        }else toast.error(data.message)
-      })
+      sendFriendRequest(userId)
     }else if(friendStatus=='pending'){
-        let request = friendRequests.find((request)=> request.receiver_id==userId)
-        request && axios.delete(`/friends/request/${request.id}`)
-        .then(({data})=>{
-          if(data.success){
-            toast.success(data.message) 
-            setRefresh((prev)=>!prev)
-          } else toast.error(data.message)
-          
-        })
+      let request = sentFriendRequests.find((request)=> request.receiver_id==userId)
+      request && removeFriendRequest(request.id)
     } else{
-      axios.delete(`/friends/${userId}`)
-      .then(({data})=>{
-        if(data.success) {
-          toast.success(data.message)
-          setRefresh((prev)=>!prev)
-        }else toast.error(data.message)
-      })
+      removeFriend(userId)
     }
-    // setRefreshContext((prev)=> !prev)
   }
   
   const likeHandler = ()=>{
-    axios.post(`/posts/like/post/${post?.id}`, {withCredentials:true})
-    .then(({data})=>{
-      if(data.success) {
-        if(liked){
-          setLikes((prevItems)=> prevItems.filter((item)=> item.user_id !== user_id))
-        }else{
-          setLikes((prevItems)=> [...prevItems, {id: (likes.length+2).toString(), user_id, post_id: post.id, comment_id: null, type:'post'}])
-        }
-        setLiked(!liked)
-        toast.success(data.success)
-      }else{
-        toast.error(data.message)
-      }
-    })
+    likePostHandler(setLikes, liked, setLiked, post.id)
   }
   
   useEffect(()=>{
@@ -125,15 +92,15 @@ const Post: React.FC<Props> = ({post})=>{
       let checkLiked = likes.filter((like)=>like.user_id==user_id)
       if(checkLiked.length>0) setLiked(true)
     }
-    if(friends || friendRequests){
-      let checkFriend = friends?.find((friend)=>friend.id==post.user_id)
+    if(myFriends || sentFriendRequests){
+      let checkFriend = myFriends?.find((friend)=>friend.id==post.user_id)
       checkFriend && setFriendStatus('friends')
-      let checkFriendRequest = friendRequests?.find((request)=>request.receiver_id == post.user_id)
+      let checkFriendRequest = sentFriendRequests?.find((request)=>request.receiver_id == post.user_id)
       checkFriendRequest && setFriendStatus('pending')
       
       if(!(checkFriend || checkFriendRequest)) setFriendStatus('none')
     }
-  },[likes, friends, friendRequests, refresh])
+  },[likes, myFriends, sentFriendRequests, refresh])
   
   return (
     <div className='post'>

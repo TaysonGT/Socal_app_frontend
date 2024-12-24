@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
-import Home from '../assets/home.png' 
-import Search from '../assets/search.png' 
-import Bell from '../assets/bell.png' 
-import Contacts from '../assets/contacts.png' 
+import Home from '/src/assets/home.png' 
+import Search from '/src/assets/search.png' 
+import Bell from '/src/assets/bell.png' 
+import Contacts from '/src/assets/contacts.png' 
 import UserIcon from '/src/assets/user.png'
-import axios from 'axios'
 import './Navbar.css'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { FriendRequestType } from '../types/types'
+import { useFriends } from '../../context/FriendsContext'
 
 interface Props {
   token: string | null;
@@ -19,6 +18,8 @@ const Navbar: React.FC<Props> = ({token, fullname}) => {
   let location = useLocation()
   const nav = useNavigate()
 
+  const {friendRequests, resetLists} = useFriends()
+
   const links = [
     {link: 'الرئيسية', path: "/", image: Home},
     {link: 'بحث', path: "/search", image: Search},
@@ -28,16 +29,14 @@ const Navbar: React.FC<Props> = ({token, fullname}) => {
 
   const [currentLocation, setCurrentLocation] =  useState(location)
   const [isSearchVisible, setIsSearchVisible] = useState(false)
-  const [friendRequests, setFriendRequests] = useState<FriendRequestType[]>([])
   const [searchQuery,setSearchQuery] = useState("")
   
   const toggleSearchBar = () =>{
     setIsSearchVisible((prev)=>!prev)
   }
   
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) =>{
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) =>{
     e.preventDefault()
-    console.log(searchQuery)
     if(searchQuery.trim()){
       nav(`/search?query=${encodeURIComponent(searchQuery)}`)
       setIsSearchVisible(false)
@@ -48,13 +47,12 @@ const Navbar: React.FC<Props> = ({token, fullname}) => {
     e.preventDefault()
     Cookies.remove('user_data')
     Cookies.remove('access_token')
+    resetLists()
     nav('/auth/login')
   }
 
   useEffect(()=>{
       setCurrentLocation(location)
-      axios.get('/friends/request/all')
-      .then(({data})=>{setFriendRequests(data.requests)})
   },[location])
 
 
@@ -92,13 +90,13 @@ const Navbar: React.FC<Props> = ({token, fullname}) => {
         </ul>
         <button  onClick={logoutHandler} className='logout-btn'>تسجيل الخروج</button>
         {isSearchVisible &&
-          <form className='search-form'>
+          <form className='search-form' onSubmit={handleSearch}>
             <input dir='rtl' type='text' placeholder='بحث'
               defaultValue={searchQuery} 
               onChange={(e) => setSearchQuery(e.currentTarget.value)}
               className='search-input'
             />
-            <button onClick={() => handleSearch} type='submit' className='search-btn'>بحث</button>
+            <button type='submit' className='search-btn'>بحث</button>
             <button type='button' className='close-btn' onClick={()=> setIsSearchVisible(false)}>x</button>
           </form>
         }

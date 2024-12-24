@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import { Navigate, useLocation, Outlet } from 'react-router-dom'
-import Navbar from '../components/Navbar';
+import Navbar from '../components/Navbar/Navbar';
 import {useState, useEffect} from 'react'
 
 const LoginRoute = () => {

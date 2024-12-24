@@ -36,3 +36,27 @@ export type CommentType = {
   post_id: string;
   created_at: Date;
 }
+
+export type FriendsContextType = {
+  myFriends: UserType[];
+  friendRequests: FriendRequestType[];
+  sentFriendRequests: FriendRequestType[];
+  friendRequestUsers: UserType[];
+  sendFriendRequest: (id: string) => void;
+  acceptFriendRequest: (id: string)=> void;
+  declineFriendRequest: (id: string)=> void;
+  removeFriendRequest: (id: string) => void;
+  removeFriend: (id: string) => void;
+  refreshLists: () => void;
+  resetLists: () => void;
+};
+
+export type SignupDataType = {
+  username: string;
+  firstname: string;
+  lastname: string;
+  password: string;
+  validPassword: string;
+  email: string;
+  gender: string;
+}

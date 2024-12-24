@@ -1,40 +1,23 @@
-import Cookies from 'js-cookie'
-import axios from 'axios'
 import React, { useState } from 'react'
-import {useNavigate, Link } from 'react-router-dom'
-import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 import './Login.css'
+import { LoginHandler } from '../../utils/Processors'
+import { useNavigate } from 'react-router'
+import { useFriends } from '../../context/FriendsContext'
 
 
 const Login: React.FC = () => {
   
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+  const navigate = useNavigate()
+
+  const { refreshLists } = useFriends()
   
-  const navigate = useNavigate();
-  const handleLogin = (e:React.FormEvent<HTMLFormElement>)=>{
-    e.preventDefault();
-    let token = Cookies.get('access_token')
-    if(!token){
-      axios.post('/api/auth/login', {username, password}, {withCredentials: true})
-      .then(({data})=>{
-        if(data.success){
-          Cookies.set('access_token', data.token, {expires: new Date(data.expDate), secure: true, path: '/'})
-          Cookies.set('user_data', JSON.stringify({
-            username: data.username, 
-            user_id: data.user_id,
-            firstname: data.firstname,
-            lastname: data.lastname
-          }), {expires: new Date(data.expDate), secure: true, path: '/'})
-          navigate('/')
-        }else{
-          toast.error(data.message)
-        }
-      }).catch(err=> console.log(err))
-    }else{
-      toast.error("لقد سجلت دخولك بالفعل!")
-      navigate('/')
-    }
+  const handleLogin = (e:React.FormEvent<HTMLFormElement>)=> {
+    e.preventDefault()
+    LoginHandler({username, password}, navigate, refreshLists)
   }
   
   return (

@@ -2,78 +2,54 @@ import React,{ useState, useEffect } from 'react';
 import { useParams} from 'react-router-dom';
 import Cookies from 'js-cookie'
 import './Profile.css';
-import Post from '../Home/Post'
-import axios from 'axios';
-import toast from 'react-hot-toast'
-import { UserType, FriendRequestType, PostType } from '../../types/types'
+import Post from '../../components/Post/Post'
+import { UserType, PostType } from '../../types/types'
+import { useFriends } from '../../context/FriendsContext';
+import { getPostsHandler, getUserFriendsHandler, getUserHandler } from '../../utils/Processors';
+import UserIcon from '/src/assets/user.png'
 
 const Profile: React.FC = () => {
-  const { userId } = useParams();
-  const [user, setUser] = useState<UserType>()
-  const [posts, setPosts] = useState<PostType[]>([])
   const [friends, setFriends] = useState<UserType[]>([])
-  const [friendRequests, setFriendRequests] = useState<FriendRequestType[]>([])
+  const { userId } = useParams();
+  const [user, setUser] = useState<UserType | null>(null)
+  const [posts, setPosts] = useState<PostType[]>([])
   const [user_id,setUser_id] = useState('')
   const [myProfile, setMyProfile] = useState(false)
   const [friendStatus, setFriendStatus] = useState('none')
-  const [refresh, setRefresh] = useState(false)
   
   const user_data = Cookies.get('user_data')
+
+  const { sentFriendRequests, myFriends, sendFriendRequest, removeFriend, removeFriendRequest } = useFriends()
   
   const handleFriendAction = () => {
-    let request = friendRequests.find((request)=> request.receiver_id==userId)
-    if(friendStatus=='none'){
-      axios.post(`/friends/request/${userId}`)
-      .then(({data})=>{
-        if(data.success){
-          toast.success(data.message)
-          setRefresh((prev)=>!prev)
-        }else toast.error(data.message)
-      })
+    let request = sentFriendRequests.find((request)=> request.receiver_id==userId)
+    if(!userId){
+      console.log('حدث خطأ')
+    }
+    else if(friendStatus=='none'){
+      sendFriendRequest(userId)
+
     }else if(friendStatus=='friends'){
-      axios.delete(`/friends/${userId}`)
-      .then(({data})=>{
-        if(data.success) {
-          toast.success(data.message)
-          setRefresh((prev)=>!prev)
-        }else toast.error(data.message)
-      })
+      removeFriend(userId)
     }else{
-      if(friendRequests && request){
-        axios.delete(`/friends/request/${request.id}`)
-        .then(({data})=>{
-          if(data.success){
-            toast.success(data.message) 
-            setRefresh((prev)=>!prev)
-          } else toast.error(data.message)
-          
-        })
+      if(sentFriendRequests && request){
+        removeFriendRequest(request.id)
       }
     }
     
   };
 
   useEffect(()=>{
-    axios.get(`/users/${userId}`)
-    .then(({data})=>{
-      setUser(data.user)
-    })
-    axios.get(`/posts/all/${userId}`)
-    .then(({data})=>{
-      setPosts(data.posts)
-    })
-    axios.get(`/friends/all/${userId}`)
-    .then(({data})=>{
-      setFriends(data.users)
-    })
-    axios.get(`/friends/request/me`)
-    .then(({data})=>{
-      setFriendRequests(data.requests)
-    })
+    if(userId) {
+      getUserHandler(setUser, userId)
+      getUserFriendsHandler(setFriends, userId)
+    }
+    getPostsHandler(setPosts)
     if(user_data){
       setUser_id(JSON.parse(user_data).user_id)
     }
-  },[refresh])
+    console.log(user)
+  },[userId])
   
   useEffect(()=>{
     if(user && user_id){
@@ -83,23 +59,24 @@ const Profile: React.FC = () => {
         setMyProfile(false)
       }
     }    
-    if(friends || friendRequests){
+    if(myFriends || sentFriendRequests){
       
-      let checkFriend = friends.find((friend)=>friend.id==user_id)
+      let checkFriend = myFriends.find((friend)=>friend.id==userId)
       checkFriend && setFriendStatus('friends')
-      let checkFriendRequest = friendRequests?.find((request)=>request.receiver_id == userId)
+      let checkFriendRequest = sentFriendRequests?.find((request)=>request.receiver_id == userId)
       checkFriendRequest && setFriendStatus('pending')
       
       if(!(checkFriend || checkFriendRequest)) setFriendStatus('none')
     }
-  },[user, friends, friendRequests, refresh])
+  console.log(myFriends?.length)
+  },[user, myFriends, sentFriendRequests])
   
   return (
     <div className="profile-page-container">
       <div className="profile-page-header">
       {user?
         <>
-        <img src='/src/assets/user.png' alt="Profile" className="profile-page-pic" />
+        <img src={UserIcon} alt="" className="profile-page-pic" />
         <h1>{`${user.firstname} ${user.lastname}`}</h1>
         <p>@{user.username}</p>
         <p>Email: {user.email}</p>
@@ -121,8 +98,8 @@ const Profile: React.FC = () => {
 
       <div className="friends-section">
         <div className='header' dir='rtl'>
-          <h2>قائمة الأصدقاء:</h2>
-          <h3>({friends.length})</h3>
+          <h2>قائمة الأصدقاء</h2>
+          <h3>({friends?.length})</h3>
         </div>
         {friends?.length>0 ?
         <div className="friends-list">
@@ -143,10 +120,10 @@ const Profile: React.FC = () => {
         }
       </div>
       <div className="posts-section">
-        <h2 dir='rtl'>{!myProfile? 'منشورات المستخدم:': 'منشوراتي'}</h2>
+        <h2 dir='rtl'>{!myProfile? 'منشورات المستخدم': 'منشوراتي'}</h2>
         <div className="posts-list">
           {posts?.map((post) => (
-            <Post {...{post, friends}}/>
+            <Post {...{post}} key={post.id}/>
           ))}
         </div>
       </div>

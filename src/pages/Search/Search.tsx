@@ -3,13 +3,12 @@ import { useLocation } from "react-router-dom";
 import axios from 'axios'
 import './Search.css'
 import '../Home/Home.css'
-import Post from '../Home/Post'
-import PeopleSlider from './PeopleSlider'
+import Post from '../../components/Post/Post'
+import PeopleSlider from '../../components/PeopleSlider/PeopleSlider'
 import { PostType, UserType } from '../../types/types'
 
 const Search: React.FC = () => {
   const [users, setUsers] = useState<UserType[]>([]);
-  const [friends, setFriends] = useState<UserType[]>([]);
   const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
@@ -26,10 +25,6 @@ const Search: React.FC = () => {
         setLoading(false);
       })
       
-    axios.get('/friends/all')
-    .then(({data})=>{
-      setFriends(data.users)
-    })
     }
   }, [query]);
 
@@ -55,7 +50,7 @@ const Search: React.FC = () => {
           <h3 className='search-feedback sec-header' dir='rtl'>المنشورات:</h3>
           <div className='posts-list'>
             {posts.map((post) => (
-              (<Post {... {post, friends}} key={post.id}/>)
+              (<Post {... {post}} key={post.id}/>)
             ))}
           </div>
         </>

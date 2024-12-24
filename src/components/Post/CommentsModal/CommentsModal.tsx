@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./CommentsModal.css";
-import Comment from './Comment'
-import { CommentType } from '../../types/types'
+import Comment from './Comment/Comment'
+import { CommentType } from '../../../types/types'
 
 interface Props{
   comments: CommentType[];

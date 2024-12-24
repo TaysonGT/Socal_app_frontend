@@ -1,44 +1,17 @@
-import {useEffect, useState} from "react";
 import "./Friends.css";
-import axios from 'axios'
-import toast from 'react-hot-toast'
 import {useNavigate} from 'react-router-dom'
-import { FriendRequestType, UserType } from '../../types/types'
-// import { getMyFriends } from '../../utils/Processors'
+import { useFriends } from "../../context/FriendsContext";
 
 const Friends = () => {
-  const [friends, setFriends] = useState<UserType[]>([])
-  const [friendRequests, setFriendRequests] = useState<FriendRequestType[]>([])
-  const [users, setUsers] = useState<UserType[]>([]) 
-  const [refresh, setRefresh] = useState(false)
-  
+  const {myFriends, friendRequests, friendRequestUsers, acceptFriendRequest, declineFriendRequest} = useFriends()
   const nav = useNavigate()
   
-  useEffect(()=>{
-    axios.get('/friends/all')
-    .then(({data})=>{
-      setFriends(data.users)
-    })
-    axios.get('/friends/request/all')
-    .then(({data})=>{
-      setFriendRequests(data.requests)
-      setUsers(data.users)
-    })
-  },[refresh])
-  
-  const onAcceptRequest = (id:string)=>{
-    axios.put(`/friends/request/accept/${id}`)
-    .then(({data})=>{
-      if(data.success){
-        toast.success(data.message)
-        setRefresh((prev)=>!prev)
-        nav('/friends')
-      }else toast.error(data.message)
-    })
+  const onAcceptRequest = (id: string)=>{
+   acceptFriendRequest(id)
   }
   
   const onDeclineRequest = (id:string)=>{
-    console.log(id)
+    declineFriendRequest(id)
   }
   
   const toProfileHandler = (id:string)=>{
@@ -51,11 +24,11 @@ const Friends = () => {
 
       <div className="section">
         <h2 className="section-title" dir='rtl'>أصدقائي</h2>
-        {!(friends?.length>0)?
+        {!(myFriends?.length>0)?
         <div className='feedback' dir='rtl'>ليس لديك أصدقاء...</div> 
         :
         <div className="friends-grid">
-          {friends?.map((friend) => (
+          {myFriends?.map((friend) => (
             <div key={friend.id} className="friend-card">
               <img
                 src={'/src/assets/user.png'}
@@ -78,7 +51,7 @@ const Friends = () => {
         
         <div className="requests-list">
           {friendRequests?.map((request) => {
-          let user = users.find((user)=>user?.id==request.sender_id) 
+          let user = friendRequestUsers.find((user)=>user?.id==request.sender_id) 
           return(
           
             <div key={request.id} className="request-card">
