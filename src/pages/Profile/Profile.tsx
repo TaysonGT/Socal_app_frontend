@@ -41,12 +41,16 @@ const Profile: React.FC = () => {
   };
 
   useEffect(()=>{
+    setUser(null)
+    setFriends([])
+    setPosts([])
+    setFriendStatus('none')
     if(userId) {
       getUserHandler(setUser, userId)
       getUserFriendsHandler(setFriends, userId)
       getUserPostsHandler(setPosts, userId)
     }
-  },[])
+  },[userId])
   
   useEffect(()=>{
     if(user && user_id){

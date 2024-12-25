@@ -12,7 +12,7 @@ const PeopleSlider: React.FC<Props> = ({users}) => {
   return (
     <div className="slider-container">
       {users?.map((user) => (
-        <PeopleCard {...{user}} />
+        <PeopleCard {...{user}} key={user.id} />
       ))}
     </div>
   );
