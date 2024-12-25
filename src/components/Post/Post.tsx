@@ -1,45 +1,35 @@
 import React, {useEffect, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import './Post.css'
-import Cookies from 'js-cookie'
-import axios from 'axios'
-import toast from 'react-hot-toast'
 import { FaRegCommentAlt, FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentsModal from './CommentsModal/CommentsModal'
 import { LikeType, CommentType, PostType, UserType } from '../../types/types'
 import { useFriends } from '../../context/FriendsContext'
-import { likePostHandler } from '../../utils/Processors'
+import { getUserHandler, likePostHandler, getPostLikesHandler, getCommentsHandler, addCommentHandler } from '../../utils/Processors'
+import { useAuth } from '../../context/AuthContext'
 
 interface Props {
   post: PostType;
 }
 
 const Post: React.FC<Props> = ({post})=>{
-  const [refresh, setRefresh] = useState(false)
+  const [user, setUser] = useState<UserType| null>(null)
+  const [comments, setComments] = useState<CommentType[]>([])
+  const [likes, setLikes] = useState<LikeType[]>([])
   const [liked, setLiked] = useState(false)
   const [friendStatus, setFriendStatus] = useState<string | null>('none')
-  const [likes, setLikes] = useState<LikeType[]>([])
-  const [comments, setComments] = useState<CommentType[]>([])
-  const [user, setUser] = useState<UserType>()
-  const [hovered, setHovered] = useState(false);
-  const [user_id,setUser_id] = useState('')
-  const user_data = Cookies.get('user_data')
-  const nav = useNavigate()
-  const {myFriends, sentFriendRequests, sendFriendRequest, removeFriend, removeFriendRequest} = useFriends()
   
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [hovered, setHovered] = useState(false);
+  const [refresh, setRefresh] = useState(false)
+
+  const nav = useNavigate()
   
+  const { id: user_id } = useAuth().currentUser!  
+  const {myFriends, sentFriendRequests, sendFriendRequest, removeFriend, removeFriendRequest} = useFriends()
   
   const handleAddComment = (content: string)=>{
-    axios.post(`/posts/comment/${post.id}`, {content}, {withCredentials:true})
-    .then(({data})=>
-    {
-      if(data.success){
-        toast.success(data.message)
-        setRefresh((prev)=>!prev)
-      }else toast.error(data.message)
-    }
-    )
+    addCommentHandler(content, setRefresh, post.id)
   }
   
   const addFriendHandler = ()=>{
@@ -62,28 +52,10 @@ const Post: React.FC<Props> = ({post})=>{
     setLikes([])
     setComments([])
     
-    if(user_data){
-      setUser_id(JSON.parse(user_data).user_id)
-    }
-    axios.get(`/users/${post.user_id}`)
-    .then(({data})=>{
-      if(data.success){
-        setUser(data.user)
-      }else{
-        toast.error('برجاء اعادة تحميل الصفحة')
-      }})
-    axios.get(`/posts/like/post/${post.id}`)
-    .then(({data})=>{
-      setLikes(data.likes)
-    })
-    axios.get(`/posts/comment/all/${post.id}`)
-    .then(({data})=>{
-      if(data.success){
-        setComments(data.comments)
-      }else{
-        toast.error('برجاء اعادة تحميل الصفحة')
-      }
-    })
+    getUserHandler(setUser, post.user_id)
+    getPostLikesHandler(setLikes, post.id)
+    getCommentsHandler(setComments, post.id)
+
   },[refresh])
   
   useEffect(()=>{

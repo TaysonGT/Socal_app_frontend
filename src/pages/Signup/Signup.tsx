@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import './Signup.css'
 import { SignUpHandler } from '../../utils/Processors'
 import { SignupDataType } from '../../types/types'
+import { useAuth } from '../../context/AuthContext'
 
 
 const Signup: React.FC = () => {
@@ -21,13 +22,14 @@ const Signup: React.FC = () => {
   
   
   const [checkValid, setCheckValid] = useState(false)
+
+  const { checkAuth } = useAuth()
   
   const navigate = useNavigate()
   
   const handleLogin = (e:React.FormEvent<HTMLFormElement>)=> {
     e.preventDefault()
-    console.log(signupData)
-    SignUpHandler(signupData, navigate)
+    SignUpHandler(signupData, navigate, checkAuth)
   }
 
   const inputHandler = (e:React.ChangeEvent<HTMLInputElement>)=>{

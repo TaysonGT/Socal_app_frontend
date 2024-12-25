@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Cookies from 'js-cookie'
 import Home from '/src/assets/home.png' 
 import Search from '/src/assets/search.png' 
 import Bell from '/src/assets/bell.png' 
@@ -8,17 +7,15 @@ import UserIcon from '/src/assets/user.png'
 import './Navbar.css'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useFriends } from '../../context/FriendsContext'
+import { useAuth } from '../../context/AuthContext'
 
-interface Props {
-  token: string | null;
-  fullname: string | null;
-}
-
-const Navbar: React.FC<Props> = ({token, fullname}) => {
+const Navbar: React.FC = () => {
   let location = useLocation()
   const nav = useNavigate()
 
   const {friendRequests, resetLists} = useFriends()
+
+  const { token, currentUser, resetAuth } = useAuth()
 
   const links = [
     {link: 'الرئيسية', path: "/", image: Home},
@@ -45,8 +42,7 @@ const Navbar: React.FC<Props> = ({token, fullname}) => {
 
   const logoutHandler = (e: React.MouseEvent<HTMLButtonElement>) =>{
     e.preventDefault()
-    Cookies.remove('user_data')
-    Cookies.remove('access_token')
+    resetAuth()
     resetLists()
     nav('/auth/login')
   }
@@ -61,7 +57,7 @@ const Navbar: React.FC<Props> = ({token, fullname}) => {
       {token&& <>
         <div className='user-container'>
           <img src={UserIcon} className='user-img' alt="" />
-          <p className='user-name'>{fullname}</p>
+          <p className='user-name'>{currentUser?.firstname} {currentUser?.lastname}</p>
         </div>
         <ul className='nav-list'>
            {links.map(({link, path, image}, i)=>

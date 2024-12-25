@@ -11,26 +11,29 @@ interface Props{
 }
 
 const CommentsModal: React.FC<Props> = ({ comments, onClose, onAddComment, setRefresh }) => {
+  
   const [newComment, setNewComment] = useState("");
-  const handleAddComment = () => {
+
+  const handleAddComment = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     if (newComment.trim()) {
       onAddComment(newComment);
-      setNewComment("");
+      setNewComment("")
     }
   };
 
   return (
     <div className="modal-overlay" onClick={onClose} dir='rtl'>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <input
+        <form className="modal-header" onSubmit={handleAddComment}>
+            <input
             type="text"
             placeholder="أضف تعليقًا..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
           />
-          <button onClick={handleAddComment}>نشر</button>
-        </div>
+          <input type="submit" value="نشر" />
+        </form>
         <div className="comments-list">
           {comments.length > 0 ? (
             comments.map((comment) => (

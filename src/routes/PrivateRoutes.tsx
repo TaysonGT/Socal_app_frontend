@@ -1,24 +1,21 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import Navbar from '../components/Navbar/Navbar';
+import { useAuth } from '../context/AuthContext';
 
 const PrivateRoutes = () => {
   const location = useLocation()
-  const data = Cookies.get('user_data')
-  const [token, setToken] = useState<string | null>(Cookies.get("access_token")?.toString() ?? null) 
-  const [fullname, setFullname] = useState<string>('') 
+  
+  const { token, checkAuth } = useAuth()
+
   useEffect(() => {
-    if(data) {
-      setToken(Cookies.get("access_token")!)
-      setFullname(`${JSON.parse(data).firstname} ${JSON.parse(data).lastname}`)
-    }
-  }, [location, data])
+    checkAuth()
+  }, [location])
 
   return (
     token? 
     <> 
-      <Navbar {...{token, fullname}} /> 
+      <Navbar /> 
       <Outlet /> 
     </> 
     : <Navigate to='/auth/login' replace state={{from: location}} />

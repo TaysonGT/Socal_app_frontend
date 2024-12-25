@@ -9,12 +9,14 @@ import Friends from './pages/Friends/Friends'
 import PrivateRoutes from './routes/PrivateRoutes'
 import LoginRoute from './routes/LoginRoute';
 import {FriendsProvider} from './context/FriendsContext'
+import { AuthProvider } from './context/AuthContext';
 import './App.css'
 
 function App() {
 
   return (
     <>
+      <AuthProvider>
       <FriendsProvider>
       <BrowserRouter>
       <Toaster position='top-left' containerStyle={
@@ -34,6 +36,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       </FriendsProvider>
+      </AuthProvider>
     
     </>
   )

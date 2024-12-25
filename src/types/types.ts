@@ -51,6 +51,15 @@ export type FriendsContextType = {
   resetLists: () => void;
 };
 
+export type AuthContextType = {
+  currentUser: UserType | null;
+  token: string | null;
+  refreshCurrentUser: ()=> void
+  refreshToken: ()=> void
+  resetAuth: () => void;
+  checkAuth: () => void;
+};
+
 export type SignupDataType = {
   username: string;
   firstname: string;

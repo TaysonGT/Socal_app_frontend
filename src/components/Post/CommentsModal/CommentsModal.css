@@ -27,7 +27,7 @@
   margin-bottom: 20px;
 }
 
-.modal-header input {
+.modal-header input[type="text"] {
   flex: 1;
   padding: 8px 12px;
   border: 1px solid #ccc;
@@ -35,7 +35,7 @@
   font-size: 14px;
 }
 
-.modal-header button {
+.modal-header input[type="submit"] {
   background: #007bff;
   color: #fff;
   border: none;
@@ -43,14 +43,15 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  transition: .2s;
 }
 
-.modal-header button:hover {
+.modal-header input[type="submit"]:hover {
   background: #0056b3;
 }
 
 .comments-list {
-  max-height: 200px;
+  max-height: 400px;
   overflow-y: auto;
   margin-bottom: 20px;
 }

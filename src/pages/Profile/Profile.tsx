@@ -1,23 +1,24 @@
 import React,{ useState, useEffect } from 'react';
 import { useParams} from 'react-router-dom';
-import Cookies from 'js-cookie'
 import './Profile.css';
 import Post from '../../components/Post/Post'
 import { UserType, PostType } from '../../types/types'
 import { useFriends } from '../../context/FriendsContext';
-import { getPostsHandler, getUserFriendsHandler, getUserHandler } from '../../utils/Processors';
+import { getUserPostsHandler, getUserFriendsHandler, getUserHandler } from '../../utils/Processors';
 import UserIcon from '/src/assets/user.png'
+import PeopleSlider from '../../components/PeopleSlider/PeopleSlider';
+import { useAuth } from '../../context/AuthContext';
 
 const Profile: React.FC = () => {
   const [friends, setFriends] = useState<UserType[]>([])
   const { userId } = useParams();
   const [user, setUser] = useState<UserType | null>(null)
   const [posts, setPosts] = useState<PostType[]>([])
-  const [user_id,setUser_id] = useState('')
   const [myProfile, setMyProfile] = useState(false)
   const [friendStatus, setFriendStatus] = useState('none')
   
-  const user_data = Cookies.get('user_data')
+  
+  const user_id = useAuth().currentUser?.id
 
   const { sentFriendRequests, myFriends, sendFriendRequest, removeFriend, removeFriendRequest } = useFriends()
   
@@ -43,13 +44,9 @@ const Profile: React.FC = () => {
     if(userId) {
       getUserHandler(setUser, userId)
       getUserFriendsHandler(setFriends, userId)
+      getUserPostsHandler(setPosts, userId)
     }
-    getPostsHandler(setPosts)
-    if(user_data){
-      setUser_id(JSON.parse(user_data).user_id)
-    }
-    console.log(user)
-  },[userId])
+  },[])
   
   useEffect(()=>{
     if(user && user_id){
@@ -68,7 +65,6 @@ const Profile: React.FC = () => {
       
       if(!(checkFriend || checkFriendRequest)) setFriendStatus('none')
     }
-  console.log(myFriends?.length)
   },[user, myFriends, sentFriendRequests])
   
   return (
@@ -86,7 +82,7 @@ const Profile: React.FC = () => {
         
         {!myProfile&& 
           <button
-            className={`friend-status-btn ${
+            className={`profile-friend-action-btn ${
               friendStatus=='friends'? 'friends-btn' : friendStatus=='pending'? 'pending-btn' : 'add-friend-btn'
             }`}
             onClick={handleFriendAction}
@@ -101,23 +97,7 @@ const Profile: React.FC = () => {
           <h2>قائمة الأصدقاء</h2>
           <h3>({friends?.length})</h3>
         </div>
-        {friends?.length>0 ?
-        <div className="friends-list">
-          {friends.map((friend) => (
-            <div key={friend?.id} className="friend-card">
-              <img
-                src='/src/assets/user.png'
-                alt={`${friend.firstname} ${friend.lastname}`}
-                className="friend-pic"
-              />
-              <h3>{`${friend?.firstname} ${friend?.lastname}`}</h3>
-              <p>@{friend?.username}</p>
-            </div>
-          ))}
-        </div>
-        : 
-          <div dir='rtl'>{!myProfile? 'هذا المستخدم ليس لديه أصدقاء...': 'ليس لديك أصدقاء بعد...'}</div>
-        }
+        <PeopleSlider {... {users: friends}}/>
       </div>
       <div className="posts-section">
         <h2 dir='rtl'>{!myProfile? 'منشورات المستخدم': 'منشوراتي'}</h2>

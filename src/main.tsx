@@ -11,12 +11,12 @@ interface Props extends AxiosRequestHeaders {
 
 axios.defaults.baseURL = 'http://localhost:5000';
 axios.interceptors.request.use((config) => {
-   const user_data = Cookies.get('user_data');
+   const current_user = Cookies.get('current_user');
    const authorization = Cookies.get('access_token');
    
    config.headers={
     Authorization: `Bearer ${authorization}`,
-    user_data: `Bearer ${user_data}`
+    user_data: `Bearer ${current_user}`
    } as Props
 
    return config;

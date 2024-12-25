@@ -35,12 +35,26 @@ export const getPostsHandler = (setPosts: React.Dispatch<React.SetStateAction<Po
     }
 }
 
+export const getUserPostsHandler = (
+  setPosts: React.Dispatch<React.SetStateAction<PostType[]>>,
+  id:string
+)=>{
+    try{
+        axios.get(`/posts/all/${id}`)
+        .then(({data})=>{
+            setPosts(data.posts)
+        })
+    }catch(error){
+        console.log(error)
+    }
+}
+
+
 export const getMyFriendsHandler  = async(setFriends: React.Dispatch<React.SetStateAction<UserType[]>>) =>{
   try{
       const {data}= await axios.get('/friends/all')
       if(data) {
         setFriends(data.users)
-        console.log(data.users)
       }
   }catch(error){
     console.log(error)
@@ -67,7 +81,6 @@ export const getFriendRequestsHandler  = async(
         if(data) {
             setFriendRequests(data.requests)
             if(setUsers) setUsers(data.users)
-              console.log(data)
         }
     }catch(error){
         console.log(error)
@@ -102,36 +115,53 @@ export const getMyFriendRequestsHandler  = (
     }
 }
 
-export const getPostLikesHandler  = (setLikes: React.Dispatch<React.SetStateAction<LikeType[]>>, id:string) =>{
+export const getPostLikesHandler  = async(setLikes: React.Dispatch<React.SetStateAction<LikeType[]>>, id:string) =>{
     try{
-      async() =>{
-        const {data}= await axios.get(`/posts/likes/post/${id}`)
+        const {data}= await axios.get(`/posts/like/post/${id}`)
         if(data) {
           setLikes(data.likes)
-        }else return []
-      }
+        }
     }catch(error){
-      return []
+      console.log(error)
     }
   }
 
-  export const getCommentsHandler  = (setComments: React.Dispatch<React.SetStateAction<CommentType[]>>, id:string) =>{
+  export const addCommentHandler  = async(
+    content:string, 
+    setRefresh: React.Dispatch<React.SetStateAction<boolean>>,
+    id: string
+  ) =>{
     try{
-      async() =>{
-        const {data}= await axios.get(`/posts/comments/all/${id}`)
+      axios.post(`/posts/comment/${id}` , {content}, {withCredentials: true})
+        .then(({data})=>{
+          if(data.success){
+            toast.success(data.message)
+            setRefresh((prev)=> !prev)
+          }else toast.error(data.message)
+        })
+    }catch(error){
+      console.log(error)
+    }
+  }
+
+  export const getCommentsHandler  = async(
+    setComments: React.Dispatch<React.SetStateAction<CommentType[]>>,
+    id:string
+  ) =>{
+    try{
+        const {data}= await axios.get(`/posts/comment/all/${id}`)
         if(data) {
           setComments(data.comments)
-        }else return []
-      }
-    }catch(error){
-      return []
+        }
+      }catch(error){
+       console.log(error)
     }
   }
 
   export const getCommentLikesHandler  = (setLikes: React.Dispatch<React.SetStateAction<LikeType[]>>, id:string) =>{
     try{
       async() =>{
-        const {data}= await axios.get(`/posts/likes/comment/${id}`)
+        const {data}= await axios.get(`/posts/like/comment/${id}`)
         if(data) {
           setLikes(data.likes)
         }else return []
@@ -198,7 +228,7 @@ export const getUserHandler  = async(
             }
             
             setLiked((prev)=>!prev)
-          }
+          }else toast.error(data.message)
         })
     }catch(error){
         console.log("couldn't find user: ", error)
@@ -224,12 +254,7 @@ export const getUserHandler  = async(
         .then(({data})=>{
             if(data.success){
             Cookies.set('access_token', data.token, {expires: new Date(data.expDate), secure: true, path: '/'})
-            Cookies.set('user_data', JSON.stringify({
-                username: data.username, 
-                user_id: data.user_id,
-                firstname: data.firstname,
-                lastname: data.lastname
-            }), {expires: new Date(data.expDate), secure: true, path: '/'})
+            Cookies.set('current_user', JSON.stringify(data. user), {expires: new Date(data.expDate), secure: true, path: '/'})
             refreshLists()
             navigate('/')
             }else{
@@ -263,7 +288,8 @@ export const getUserHandler  = async(
         username: string, 
         password:string
     },
-    navigate: NavigateFunction
+    navigate: NavigateFunction,
+    checkAuth: ()=> void
 ) =>{
     try{
         let token = Cookies.get('access_token')
@@ -277,12 +303,8 @@ export const getUserHandler  = async(
             
                 if(data.success){
                     Cookies.set('access_token', data.token, {expires: new Date(data.expDate), secure: true, path: '/'})
-                    Cookies.set('user_data', JSON.stringify({
-                        username: data.username, 
-                        user_id: data.user_id,
-                        firstname: data.firstname,
-                        lastname: data.lastname
-                    }), {expires: new Date(data.expDate), secure: true, path: '/'})
+                    Cookies.set('current_user', JSON.stringify(data.user), {expires: new Date(data.expDate), secure: true, path: '/'})
+                    checkAuth()
                     navigate('/')
                 }else{
                     toast.error(data.message)
